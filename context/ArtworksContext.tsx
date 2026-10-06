@@ -5,6 +5,7 @@ import type { Artwork } from '@/lib/types';
 
 type ArtworksContextValue = {
   artworks: Artwork[];
+  isSample: boolean;
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
@@ -15,6 +16,7 @@ const ArtworksContext = createContext<ArtworksContextValue | null>(null);
 
 export function ArtworksProvider({ children }: { children: ReactNode }) {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [isSample, setIsSample] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +24,9 @@ export function ArtworksProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
     try {
-      setArtworks(await fetchArtworks());
+      const result = await fetchArtworks();
+      setArtworks(result.artworks);
+      setIsSample(result.sample);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong');
     } finally {
@@ -35,8 +39,8 @@ export function ArtworksProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const value = useMemo(
-    () => ({ artworks, loading, error, refresh, getById: (id: string) => artworks.find((a) => a.id === id) }),
-    [artworks, loading, error, refresh],
+    () => ({ artworks, isSample, loading, error, refresh, getById: (id: string) => artworks.find((a) => a.id === id) }),
+    [artworks, isSample, loading, error, refresh],
   );
 
   return <ArtworksContext.Provider value={value}>{children}</ArtworksContext.Provider>;

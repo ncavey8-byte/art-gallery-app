@@ -1,13 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '@/constants/theme';
+import { useArtworks } from '@/context/ArtworksContext';
 import { isDemoMode } from '@/lib/api';
 
 export function DemoBanner() {
-  if (!isDemoMode) return null;
+  const { isSample } = useArtworks();
+  if (!isSample) return null;
   return (
     <View style={styles.banner}>
-      <Text style={styles.text}>Preview mode: sample artwork. Payments and emails are not live yet.</Text>
+      <Text style={styles.text}>{isDemoMode ? 'Preview mode: sample artwork. Payments and emails are not live yet.' : 'Preview mode: sample artwork. Payments are not live yet.'}</Text>
     </View>
   );
 }

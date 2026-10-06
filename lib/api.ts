@@ -9,12 +9,14 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
 // Without a backend URL the app runs on sample data and checkout is simulated.
 export const isDemoMode = !API_URL;
 
-export async function fetchArtworks(): Promise<Artwork[]> {
-  if (!API_URL) return sampleArtworks;
+// `sample` is true when showing placeholder artwork because the shop (Stripe) isn't connected yet.
+export async function fetchArtworks(): Promise<{ artworks: Artwork[]; sample: boolean }> {
+  if (!API_URL) return { artworks: sampleArtworks, sample: true };
   const res = await fetch(`${API_URL}/artworks`);
+  if (res.status === 503) return { artworks: sampleArtworks, sample: true };
   if (!res.ok) throw new Error(`Could not load artwork (${res.status})`);
   const data: { artworks: Artwork[] } = await res.json();
-  return data.artworks;
+  return { artworks: data.artworks, sample: false };
 }
 
 export async function createCheckoutSession(params: {

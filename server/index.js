@@ -27,7 +27,8 @@ const mailer =
         host: SMTP_HOST,
         port: Number(SMTP_PORT),
         secure: Number(SMTP_PORT) === 465,
-        auth: { user: SMTP_USER, pass: SMTP_PASS },
+        // Gmail shows App Passwords in groups of four; the spaces aren't part of the password.
+        auth: { user: SMTP_USER, pass: SMTP_HOST === 'smtp.gmail.com' ? SMTP_PASS.replace(/\s+/g, '') : SMTP_PASS },
       })
     : null;
 

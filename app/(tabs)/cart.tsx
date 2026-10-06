@@ -8,8 +8,9 @@ import { Button } from '@/components/Button';
 import { DemoBanner } from '@/components/DemoBanner';
 import { imageSource } from '@/lib/imageSource';
 import { colors, formatPrice, serif } from '@/constants/theme';
+import { useArtworks } from '@/context/ArtworksContext';
 import { useCart } from '@/context/CartContext';
-import { createCheckoutSession, isDemoMode } from '@/lib/api';
+import { createCheckoutSession } from '@/lib/api';
 
 function showError(message: string) {
   if (Platform.OS === 'web') window.alert(message);
@@ -18,10 +19,11 @@ function showError(message: string) {
 
 export default function CartScreen() {
   const { items, total, remove } = useCart();
+  const { isSample } = useArtworks();
   const [loading, setLoading] = useState(false);
 
   async function checkout() {
-    if (isDemoMode) {
+    if (isSample) {
       router.replace({ pathname: '/checkout/success', params: { demo: '1' } });
       return;
     }
