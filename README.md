@@ -39,7 +39,7 @@ To list a sold piece for sale again, remove its `sold` metadata in Stripe.
 
 ## Commission emails
 
-Commission requests are sent by the server (`POST /commission`) with the photos attached and the customer's address as Reply-To. Set the `SMTP_*` values in `server/.env`. For Gmail: turn on 2-Step Verification, create an [App Password](https://myaccount.google.com/apppasswords), then use `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER=<gmail address>`, `SMTP_PASS=<app password>`. Photos are converted to JPEG on the phone (including iPhone HEIC), one photo per request.
+Commission requests are sent by the server (`POST /commission`) with the photos attached and the customer's address as Reply-To. Set `RESEND_API_KEY` (from [resend.com](https://resend.com), sign up with the `COMMISSION_EMAIL_TO` address so it can deliver without a verified domain), or the `SMTP_*` values in `server/.env`. Hosts like Render's free plan block SMTP ports, so use Resend there. For Gmail SMTP: turn on 2-Step Verification, create an [App Password](https://myaccount.google.com/apppasswords), then use `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER=<gmail address>`, `SMTP_PASS=<app password>`. Photos are converted to JPEG on the phone (including iPhone HEIC), one photo per request.
 
 ## Publishing to the App Store / Google Play
 

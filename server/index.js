@@ -16,6 +16,7 @@ const {
   SMTP_USER,
   SMTP_PASS,
   MAIL_FROM,
+  RESEND_API_KEY,
   COMMISSION_EMAIL_TO = 'ncavey8@gmail.com',
   PORT = 4242,
 } = process.env;
@@ -33,7 +34,31 @@ const mailer =
     : null;
 
 if (!stripe) console.warn('STRIPE_SECRET_KEY not set: shop endpoints are disabled.');
-if (!mailer) console.warn('SMTP settings not set: commission requests cannot be emailed.');
+const emailConfigured = Boolean(RESEND_API_KEY || mailer);
+if (!emailConfigured) console.warn('RESEND_API_KEY or SMTP settings not set: commission requests cannot be emailed.');
+
+// Resend's HTTP API works on hosts that block SMTP ports (e.g. Render's free plan); SMTP is the fallback.
+async function sendEmail(message) {
+  if (!RESEND_API_KEY) return mailer.sendMail(message);
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: message.from,
+      to: message.to,
+      reply_to: message.replyTo.address,
+      subject: message.subject,
+      text: message.text,
+      html: message.html,
+      attachments: message.attachments.map((a) => ({
+        filename: a.filename,
+        content: a.content.toString('base64'),
+        content_type: a.contentType,
+      })),
+    }),
+  });
+  if (!res.ok) throw new Error(`Resend error ${res.status}: ${await res.text()}`);
+}
 
 const app = express();
 app.use(cors());
@@ -166,7 +191,7 @@ const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 app.post('/commission', upload.array('photos', MAX_PHOTOS), async (req, res) => {
-  if (!mailer) return res.status(503).json({ error: 'Commission requests are not configured yet' });
+  if (!emailConfigured) return res.status(503).json({ error: 'Commission requests are not configured yet' });
 
   const canvasSize = oneLine(req.body.canvasSize);
   const medium = oneLine(req.body.medium);
@@ -193,8 +218,8 @@ app.post('/commission', upload.array('photos', MAX_PHOTOS), async (req, res) => 
   ];
 
   try {
-    await mailer.sendMail({
-      from: MAIL_FROM || SMTP_USER,
+    await sendEmail({
+      from: MAIL_FROM || (RESEND_API_KEY ? 'Emily Cavey Fine Art <onboarding@resend.dev>' : SMTP_USER),
       to: COMMISSION_EMAIL_TO,
       replyTo: { name, address: email },
       subject: `New portrait commission: ${size} ${MEDIUMS[medium].toLowerCase()} for ${name}`,
