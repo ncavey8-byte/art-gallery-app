@@ -16,6 +16,8 @@ npx expo start        # scan the QR code with Expo Go, or press w for web
 
 Without `EXPO_PUBLIC_API_URL` set, the app runs in **preview mode**: sample artwork (`data/sampleArtworks.ts`) and a simulated checkout.
 
+`EXPO_PUBLIC_API_URL` is set in `.env` to the hosted server on Render (`https://art-gallery-app-nszq.onrender.com`). Until Stripe is connected there, the app still shows sample artwork with a simulated checkout, but commission requests are emailed for real.
+
 ## Go live with Stripe
 
 Artwork is managed in Stripe, so there's no separate database to keep up to date.
