@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "art_em_c",
+    "name": "Emily Cavey Fine Art",
     "slug": "art-gallery-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -32,6 +32,13 @@
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
           "backgroundColor": "#FAF7F2"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos so you can attach reference images to a portrait commission.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to use your camera to take reference photos for a portrait commission."
         }
       ]
     ],

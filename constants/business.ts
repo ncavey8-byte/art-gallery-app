@@ -2,8 +2,9 @@ import type { ImageSourcePropType } from 'react-native';
 
 // Edit this file to update the About Us page and contact details.
 export const business = {
-  name: 'art_em_c',
-  tagline: 'Original artwork, made by hand.',
+  name: 'Emily Cavey',
+  title: 'Emily Cavey - Fine Art',
+  tagline: 'Pet portraits, people portraits and original works.',
   instagramHandle: 'art_em_c',
   instagramUrl: 'https://www.instagram.com/art_em_c/',
   email: 'hello@example.com',
@@ -14,7 +15,7 @@ export const business = {
   ],
   offerings: [
     { title: 'Original works', body: 'One-of-a-kind pieces. When it is sold, it is gone.' },
-    { title: 'Commissions', body: 'Have something specific in mind? Reach out to discuss a custom piece.' },
+    { title: 'Portrait commissions', body: 'Custom pencil or oil portraits of your pets and loved ones. Start a request from the Commission tab.' },
     { title: 'Careful shipping', body: 'Every artwork is packed by hand and shipped with tracking.' },
   ],
 };

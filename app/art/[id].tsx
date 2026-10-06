@@ -3,6 +3,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { imageSource } from '@/lib/imageSource';
+import { categoryLabels, isPortrait } from '@/constants/gallery';
 import { colors, formatPrice, serif } from '@/constants/theme';
 import { useArtworks } from '@/context/ArtworksContext';
 import { useCart } from '@/context/CartContext';
@@ -27,6 +28,7 @@ export default function ArtworkDetailScreen() {
     <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
       <Stack.Screen options={{ title: artwork.title }} />
       <Image source={imageSource(artwork.image)} style={styles.image} resizeMode="cover" />
+      <Text style={styles.category}>{categoryLabels[artwork.category]}</Text>
       <Text style={styles.title}>{artwork.title}</Text>
       <Text style={[styles.price, artwork.sold && styles.sold]}>
         {artwork.sold ? 'Sold' : formatPrice(artwork.price, artwork.currency)}
@@ -56,6 +58,13 @@ export default function ArtworkDetailScreen() {
           <Button title="Add to cart" variant="secondary" onPress={() => add(artwork)} />
         </View>
       )}
+
+      {isPortrait(artwork.category) && (
+        <View style={styles.commission}>
+          <Text style={styles.commissionText}>Want a portrait like this of your own pet or loved one?</Text>
+          <Button title="Request a commission" variant="secondary" onPress={() => router.navigate('/commission')} />
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -75,12 +84,15 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
   muted: { color: colors.muted },
   image: { width: '100%', aspectRatio: 4 / 5, borderRadius: 8, backgroundColor: colors.border },
-  title: { fontFamily: serif, fontSize: 30, color: colors.text, marginTop: 20 },
+  category: { fontSize: 12, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: colors.accent, marginTop: 20 },
+  title: { fontFamily: serif, fontSize: 30, color: colors.text, marginTop: 6 },
   price: { fontSize: 20, fontWeight: '600', color: colors.text, marginTop: 6 },
   sold: { color: colors.sold },
   details: { marginVertical: 20, borderTopWidth: 1, borderTopColor: colors.border },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
   detailLabel: { color: colors.muted, fontSize: 15 },
   detailValue: { color: colors.text, fontSize: 15 },
+  commission: { marginTop: 32, padding: 20, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, gap: 14 },
+  commissionText: { fontFamily: serif, fontSize: 18, color: colors.text, textAlign: 'center' },
   description: { fontSize: 16, lineHeight: 25, color: colors.text, marginBottom: 24 },
 });

@@ -7,7 +7,7 @@ export function DemoBanner() {
   if (!isDemoMode) return null;
   return (
     <View style={styles.banner}>
-      <Text style={styles.text}>Preview mode: sample artwork, no real payments.</Text>
+      <Text style={styles.text}>Preview mode: sample artwork. Payments and emails are not live yet.</Text>
     </View>
   );
 }

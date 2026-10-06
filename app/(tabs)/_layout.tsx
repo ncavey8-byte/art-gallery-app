@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { business } from '@/constants/business';
 import { colors, serif } from '@/constants/theme';
 import { useCart } from '@/context/CartContext';
 
@@ -24,8 +25,19 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Gallery',
+          headerTitle: business.title,
           tabBarIcon: ({ color }) => (
             <SymbolView name={{ ios: 'photo.on.rectangle', android: 'photo_library', web: 'photo_library' }} tintColor={color} size={26} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="commission"
+        options={{
+          title: 'Commission',
+          headerTitle: 'Commission a Portrait',
+          tabBarIcon: ({ color }) => (
+            <SymbolView name={{ ios: 'paintbrush.pointed', android: 'brush', web: 'brush' }} tintColor={color} size={26} />
           ),
         }}
       />
