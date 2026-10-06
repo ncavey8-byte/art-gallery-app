@@ -31,7 +31,7 @@ export async function pickPhotos(source: 'library' | 'camera', limit: number): P
   } else {
     result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsMultipleSelection: true,
+      allowsMultipleSelection: limit > 1,
       selectionLimit: limit,
       quality: 1,
     });

@@ -21,7 +21,7 @@ import { isDemoMode, submitCommission } from '@/lib/api';
 import { pickPhotos, type CommissionPhoto } from '@/lib/photos';
 import type { CanvasSize, CommissionMedium } from '@/lib/types';
 
-const MAX_PHOTOS = 5;
+const MAX_PHOTOS = 1;
 
 const SIZES: { value: CanvasSize; label: string; preview: number }[] = [
   { value: '10x10', label: '10 × 10 in', preview: 18 },
@@ -62,8 +62,8 @@ export default function CommissionScreen() {
 
   async function addPhotos(source: 'library' | 'camera') {
     try {
-      const picked = await pickPhotos(source, MAX_PHOTOS - photos.length);
-      setPhotos((prev) => [...prev, ...picked].slice(0, MAX_PHOTOS));
+      const picked = await pickPhotos(source, MAX_PHOTOS);
+      if (picked.length) setPhotos((prev) => [...prev, ...picked].slice(-MAX_PHOTOS));
     } catch (e) {
       showMessage(e instanceof Error ? e.message : 'Could not add that photo');
     }
@@ -101,7 +101,7 @@ export default function CommissionScreen() {
         <Text style={styles.doneBody}>
           {isDemoMode
             ? 'Preview mode: no email was sent. Once email is connected, requests go straight to Emily.'
-            : `Thank you! Emily will review your photos and reply to ${submittedEmail} with next steps.`}
+            : `Thank you! Emily will review your photo and reply to ${submittedEmail} with next steps.`}
         </Text>
         <Button title="Start another request" variant="secondary" onPress={reset} style={{ alignSelf: 'stretch' }} />
       </View>
@@ -138,8 +138,8 @@ export default function CommissionScreen() {
           </View>
         </Step>
 
-        <Step number={3} title="Upload your photos" done={photos.length > 0}>
-          <Text style={styles.hint}>Clear, well-lit photos work best. Add up to {MAX_PHOTOS}.</Text>
+        <Step number={3} title="Upload your photo" done={photos.length > 0}>
+          <Text style={styles.hint}>A clear, well-lit photo works best.</Text>
           {photos.length > 0 && (
             <View style={styles.photos}>
               {photos.map((p, i) => (
@@ -156,12 +156,10 @@ export default function CommissionScreen() {
               ))}
             </View>
           )}
-          {photos.length < MAX_PHOTOS && (
-            <View style={styles.photoButtons}>
-              <Button title="Choose photos" variant="secondary" onPress={() => addPhotos('library')} style={{ flex: 1 }} />
-              {Platform.OS !== 'web' && <Button title="Take a photo" variant="secondary" onPress={() => addPhotos('camera')} style={{ flex: 1 }} />}
-            </View>
-          )}
+          <View style={styles.photoButtons}>
+            <Button title={photos.length ? 'Replace photo' : 'Choose a photo'} variant="secondary" onPress={() => addPhotos('library')} style={{ flex: 1 }} />
+            {Platform.OS !== 'web' && <Button title="Take a photo" variant="secondary" onPress={() => addPhotos('camera')} style={{ flex: 1 }} />}
+          </View>
         </Step>
 
         <Step number={4} title="Your details" done={!!name.trim() && EMAIL_PATTERN.test(email.trim())}>
@@ -222,7 +220,7 @@ const styles = StyleSheet.create({
   sizePreviewSelected: { borderColor: colors.accent, backgroundColor: '#F3D9CB' },
   hint: { fontSize: 14, color: colors.muted, marginBottom: 12 },
   photos: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12 },
-  photo: { width: 96, height: 96, borderRadius: 8, backgroundColor: colors.border },
+  photo: { width: 140, height: 140, borderRadius: 8, backgroundColor: colors.border },
   removePhoto: { position: 'absolute', top: -6, right: -6, width: 24, height: 24, borderRadius: 12, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
   removePhotoText: { color: '#fff', fontSize: 16, lineHeight: 18, fontWeight: '700' },
   photoButtons: { flexDirection: 'row', gap: 10 },

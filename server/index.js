@@ -151,7 +151,7 @@ app.get('/return', (req, res) => {
 
 const CANVAS_SIZES = ['10x10', '20x20', '30x30'];
 const MEDIUMS = { pencil: 'Pencil', oil: 'Oil paint' };
-const MAX_PHOTOS = 5;
+const MAX_PHOTOS = 1;
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -179,7 +179,7 @@ app.post('/commission', upload.array('photos', MAX_PHOTOS), async (req, res) => 
   if (!MEDIUMS[medium]) return res.status(400).json({ error: 'Please choose pencil or oil paint' });
   if (!name) return res.status(400).json({ error: 'Please enter your name' });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email address' });
-  if (photos.length === 0) return res.status(400).json({ error: 'Please attach at least one photo' });
+  if (photos.length === 0) return res.status(400).json({ error: 'Please attach a photo' });
 
   const size = canvasSize.replace('x', ' × ') + ' in';
   const details = [
@@ -188,7 +188,7 @@ app.post('/commission', upload.array('photos', MAX_PHOTOS), async (req, res) => 
     ['Name', name],
     ['Email', email],
     ['Phone', phone || 'Not provided'],
-    ['Photos attached', String(photos.length)],
+    ['Photo attached', photos[0].originalname || 'photo.jpg'],
   ];
 
   try {
@@ -201,7 +201,7 @@ app.post('/commission', upload.array('photos', MAX_PHOTOS), async (req, res) => 
       html: `<h2>New portrait commission request</h2>
 <table cellpadding="6">${details.map(([k, v]) => `<tr><td><b>${k}</b></td><td>${escapeHtml(v)}</td></tr>`).join('')}</table>
 <p><b>Notes:</b><br>${notes ? escapeHtml(notes).replace(/\n/g, '<br>') : 'None'}</p>
-<p>Reply to this email to respond to ${escapeHtml(name)} directly. Reference photos are attached.</p>`,
+<p>Reply to this email to respond to ${escapeHtml(name)} directly. The reference photo is attached.</p>`,
       attachments: photos.map((p, i) => ({
         filename: p.originalname || `photo-${i + 1}.jpg`,
         content: p.buffer,
@@ -217,7 +217,10 @@ app.post('/commission', upload.array('photos', MAX_PHOTOS), async (req, res) => 
 
 app.use((err, _req, res, next) => {
   if (err instanceof multer.MulterError) {
-    const message = err.code === 'LIMIT_FILE_SIZE' ? 'Each photo must be under 15 MB' : `Upload error: ${err.message}`;
+    const message =
+      err.code === 'LIMIT_FILE_SIZE' ? 'The photo must be under 15 MB'
+      : err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE' ? 'Please attach just one photo'
+      : `Upload error: ${err.message}`;
     return res.status(400).json({ error: message });
   }
   next(err);
